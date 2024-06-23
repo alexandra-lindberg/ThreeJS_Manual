@@ -1,5 +1,5 @@
 import './resources/stylesheets/style.css'
-import * as meshCollection from './resources/models/meshCollections.js' 
+import * as meshCollection from './resources/models/meshCollections.ts' 
 import * as three from 'three'; 
 
 // The Big Three.

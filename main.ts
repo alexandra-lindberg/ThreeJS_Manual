@@ -6,6 +6,7 @@ import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { uniform } from 'three/examples/jsm/nodes/Nodes.js';
 
 // Compatability Check.
 if ( WebGL.isWebGLAvailable() ) {
@@ -16,11 +17,13 @@ if ( WebGL.isWebGLAvailable() ) {
     const renderer = new THREE.WebGLRenderer( {
         canvas: document.querySelector('#app') as HTMLElement,
     });
+	const clock = new THREE.Clock(true);
 
     const controls = new OrbitControls( camera, renderer.domElement );
 
     // Sets the size.
     renderer.setSize( window.innerWidth, window.innerHeight );
+	scene.background = new THREE.Color( 'gray');
     
     // Adds a callback function.
     window.addEventListener('resize', callbackResizePage, false);
@@ -29,70 +32,42 @@ if ( WebGL.isWebGLAvailable() ) {
     renderer.setAnimationLoop(animate);
         
     // Sets camera position
-    camera.position.set(0, 10, 50);
-
+    camera.position.set(0, 0, 5);
     camera.rotateX(0.0);
-
     
     // Renders blank canvas
     renderer.render( scene, camera);
     
     
+	// ## ASYNC ##
+	async function handleModels() {
+		const result = await meshCollection.loadAsyncModels();
+		console.log(result);
+
+		// ## MODELS : ADD ##
+		for(const [key, model] of result) {
+			scene.add(model);
+		}
+
+		return result;
+	}
+    let models;
+	models = await handleModels();
+	//console.log(models);
     
-    
-// ## MODELS : ADD ##
-    // Adds objects
-    //scene.add(meshCollection.cube);
-    //scene.add(meshCollection.line);
-    //console.log(meshCollection.line);
-    
-    // const {pidgeon} = await meshCollection.loadModels(); //.then((model) => {scene.add(model.pidgeon)}  );
-    // scene.add(pidgeon);
+	console.log(scene);
+// ## FUNCTIONS : USER ##    
+    function animate() { // Render loop.
+		let t = clock.getDelta();
+		
+        if (models !== undefined) {
+			models.get('Pidgeon').rotation.x += (1.0 * t);
 
-    let pidgeon: THREE.Object3D<THREE.Object3DEventMap> | undefined;
+			// WARNING: UGLY AND PERFORMANCE WASTE:
+			models.get('Pidgeon_Normal').position.x = THREE.MathUtils.clamp(models.get('Pidgeon_Normal').position.x += (1.0 * t), 0.0, 1.0);
+		}
 
-    // const perlin = new ImprovedNoise();
-    // let pos;
-    // let uv;
-    // let vUv = new THREE.Vector2();
-    // let clock = new THREE.Clock();
-    // ({ pidgeon } = await meshCollection.loadAsyncModels()); //.then((model) => {scene.add(model.pidgeon)}  );
-    
-    // if(pidgeon[0] !== undefined)
-    // {
-    //     scene.add(pidgeon);
-    //     pos = pidgeon[0].geometry.attributes.position;
-    //     uv  = pidgeon[0].geometry.attributes.uv;
-    // }
-
-    // let hello = meshCollection.loadModels();
-    // if(hello !== undefined)
-    // {        
-    //     scene.add(hello);
-    //     console.log("Again.");
-    // }
-
-    // ANIM
-    
-    //console.log(test);
-    
-// ## FUNCTIONS : USER ##
-    // Render loop.
-    function animate() {       
-
-        // if(pidgeon !== undefined)
-        // {
-        //     let t = clock.getElapsedTime();
-        //     for(let i = 0; i < pos.count; i++){
-        //         vUv.fromBufferAttribute(uv, i).multiplyScalar(1.5);
-        //         let y = perlin.noise(vUv.x, vUv.y + t, t * 0.1);
-        //         pos.setY(i, y);
-        //     } pos.needUpdate = true;
-        // }
-
-        //pidgeon.rotation.y += 0.1;
-        
-
+		
         controls.update();      
         renderer.render( scene, camera );
     }    

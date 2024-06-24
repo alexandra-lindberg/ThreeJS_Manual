@@ -118,10 +118,33 @@ async function loadAsyncModels() {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath( './examples/jsm/libs/draco/' );
     loader.setDRACOLoader( dracoLoader );
-    
+
+	const loadContainer : Array<GLTF> = await Promise.all( [
+		loader.loadAsync('./resources/models/pidgeon_normal.glb', function ( xhr ) {console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );}),
+		loader.loadAsync('./resources/models/pidgeon.glb', function ( xhr ) {console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );}),
+	] );
+	
+	const modelContainer = new Map();
+	modelContainer.set("Pidgeon_Normal", setupModel(loadContainer[0]));
+	modelContainer.set("Pidgeon", setupModel(loadContainer[1]));
+	
+
+	return modelContainer;
 }
 
-  
+export { loadAsyncModels };
+
+  /* == ARRAY ==	
+	const modelContainer : Array<THREE.Object3D<THREE.Object3DEventMap>> = [];	
+	for ( const models of loadContainer )
+	modelContainer.push(setupModel(models));
+	modelContainer[0].position.x += 1;*/
+	
+	/* == TESTING: OBJECT PROPERTIES ==
+	let test1; let test2;
+	const named = { test1,  test2 };
+	for(const [key, value] of Object.entries(named))
+		console.log(`${key} and ${value}`);*/
 
 // ### PRIMITIVES ###
 // -- CUBE --

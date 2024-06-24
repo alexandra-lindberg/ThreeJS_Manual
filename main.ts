@@ -1,5 +1,7 @@
 import './resources/stylesheets/style.css';
 import * as meshCollection from './scripts/meshCollections.ts';
+import { setupCallbacks } from './Source/Systems/callbackManager.ts';
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
@@ -13,8 +15,11 @@ if ( WebGL.isWebGLAvailable() ) {
 
 // Creates the basic three.
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    //const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 1000);
+
     const renderer = new THREE.WebGLRenderer( {
+		antialias: true,
         canvas: document.querySelector('#app') as HTMLElement,
     });
 	const clock = new THREE.Clock(true);
@@ -24,9 +29,6 @@ if ( WebGL.isWebGLAvailable() ) {
     // Sets the size.
     renderer.setSize( window.innerWidth, window.innerHeight );
 	scene.background = new THREE.Color( 'gray');
-    
-    // Adds a callback function.
-    window.addEventListener('resize', callbackResizePage, false);
 
     // Sets function that is animation loop.
     renderer.setAnimationLoop(animate);
@@ -39,45 +41,33 @@ if ( WebGL.isWebGLAvailable() ) {
     renderer.render( scene, camera);
     
     
-	// ## ASYNC ##
+// ## ASYNC : MODELS ##
 	async function handleModels() {
 		const result = await meshCollection.loadAsyncModels();
 		console.log(result);
 
 		// ## MODELS : ADD ##
-		for(const [key, model] of result) {
+		for( const model of result )
 			scene.add(model);
-		}
 
 		return result;
-	}
-    let models;
-	models = await handleModels();
-	//console.log(models);
-    
+	}    
+	await handleModels();    
+	
 	console.log(scene);
+
 // ## FUNCTIONS : USER ##    
     function animate() { // Render loop.
-		let t = clock.getDelta();
-		
-        if (models !== undefined) {
-			models.get('Pidgeon').rotation.x += (1.0 * t);
-
-			// WARNING: UGLY AND PERFORMANCE WASTE:
-			models.get('Pidgeon_Normal').position.x = THREE.MathUtils.clamp(models.get('Pidgeon_Normal').position.x += (1.0 * t), 0.0, 1.0);
-		}
-
-		
+		let dTime = clock.getDelta();
+		scene.getObjectByName('Pidgeon')?.rotateY(1.0 * dTime);
+        		
         controls.update();      
         renderer.render( scene, camera );
     }    
 
-// ## FUNCTIONS : CALLBACK ##
-    function callbackResizePage() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+// ## FUNCTIONS : CALLBACKS ##
+    setupCallbacks(camera, undefined);
+    
 } else {
 	const warning = WebGL.getWebGLErrorMessage();
 	const canvasElement = document.getElementById( "container" ); 

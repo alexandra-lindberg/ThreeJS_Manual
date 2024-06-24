@@ -52,7 +52,7 @@ if ( WebGL.isWebGLAvailable() ) {
 
 		return result;
 	}    
-	await handleModels();    
+	handleModels();    
 	
 	console.log(scene);
 

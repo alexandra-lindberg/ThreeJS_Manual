@@ -51,19 +51,27 @@ if ( WebGL.isWebGLAvailable() ) {
 
     let pidgeon: THREE.Object3D<THREE.Object3DEventMap> | undefined;
 
-    const perlin = new ImprovedNoise();
-    let pos;
-    let uv;
-    let vUv = new THREE.Vector2();
-    let clock = new THREE.Clock();
-    ({ pidgeon } = await meshCollection.loadModels()); //.then((model) => {scene.add(model.pidgeon)}  );
+    // const perlin = new ImprovedNoise();
+    // let pos;
+    // let uv;
+    // let vUv = new THREE.Vector2();
+    // let clock = new THREE.Clock();
+    // ({ pidgeon } = await meshCollection.loadAsyncModels()); //.then((model) => {scene.add(model.pidgeon)}  );
     
-    if(pidgeon[0] !== undefined)
-    {
-        scene.add(pidgeon);
-        pos = pidgeon[0].geometry.attributes.position;
-        uv  = pidgeon[0].geometry.attributes.uv;
-    }
+    // if(pidgeon[0] !== undefined)
+    // {
+    //     scene.add(pidgeon);
+    //     pos = pidgeon[0].geometry.attributes.position;
+    //     uv  = pidgeon[0].geometry.attributes.uv;
+    // }
+
+    // let hello = meshCollection.loadModels();
+    // if(hello !== undefined)
+    // {        
+    //     scene.add(hello);
+    //     console.log("Again.");
+    // }
+
     // ANIM
     
     //console.log(test);
@@ -72,25 +80,20 @@ if ( WebGL.isWebGLAvailable() ) {
     // Render loop.
     function animate() {       
 
-        if(pidgeon !== undefined)
-        {
-            let t = clock.getElapsedTime();
-            for(let i = 0; i < pos.count; i++){
-                vUv.fromBufferAttribute(uv, i).multiplyScalar(1.5);
-                let y = perlin.noise(vUv.x, vUv.y + t, t * 0.1);
-                pos.setY(i, y);
-            } pos.needUpdate = true;
-        }
+        // if(pidgeon !== undefined)
+        // {
+        //     let t = clock.getElapsedTime();
+        //     for(let i = 0; i < pos.count; i++){
+        //         vUv.fromBufferAttribute(uv, i).multiplyScalar(1.5);
+        //         let y = perlin.noise(vUv.x, vUv.y + t, t * 0.1);
+        //         pos.setY(i, y);
+        //     } pos.needUpdate = true;
+        // }
 
         //pidgeon.rotation.y += 0.1;
         
 
-        controls.update();
-
-
-
-        
-      
+        controls.update();      
         renderer.render( scene, camera );
     }    
 

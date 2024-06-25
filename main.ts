@@ -5,6 +5,7 @@ import { setupCamera } from './Source/Components/cameraManager.ts';
 import { setupScene } from './Source/Components/sceneManager.ts';
 import { setupRenderer } from './Source/Components/rendererManager.ts';
 import { setupModels } from './Source/Components/modelManager.ts';
+import { setupLights } from './Source/Components/lightManager.ts';
 // == ThreeJS ==
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -19,33 +20,33 @@ if ( WebGL.isWebGLAvailable() ) {
     const camera = setupCamera(false);
     const renderer = setupRenderer();
     
+    // Additionals
 	const clock       = new THREE.Clock(true);
     const controls    = new OrbitControls( camera, renderer.domElement );
-    const pointer     = new THREE.Vector2();
-    const raycaster   = new THREE.Raycaster();
-    
+
     // Sets function that is animation loop.
-    renderer.setAnimationLoop(animate);
+    renderer.setAnimationLoop(renderLoop);
     // Renders blank canvas
     renderer.render( scene, camera);
     
+    setupLights(scene);
 // ## ASYNC : MODELS ##    
-    await setupModels(scene);
+    setupModels(scene);
 
-// ## FUNCTIONS : USER ##    
-    function animate() { // Render loop.
+// ## FUNCTIONS : RENDER LOOP ##    
+    function renderLoop() { // Render loop.
 		let dTime = clock.getDelta();        
         
-        scene.getObjectByName('')?.rotateY(1 * dTime); 
+        scene.getObjectByName('model')?.rotateY(1 * dTime); 
         		
         controls.update();      
         renderer.render( scene, camera );
     }    
 
 // ## FUNCTIONS : CALLBACKS ##
-    setupCallbacks(camera, renderer, scene,pointer,raycaster);
+    setupCallbacks(camera, renderer, scene);
     
-} else {
+} else { // Displays an error message if WebGL is not supported.
 	const warning = WebGL.getWebGLErrorMessage();
 	const canvasElement = document.getElementById( "container" ); 
 

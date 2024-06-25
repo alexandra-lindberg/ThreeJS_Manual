@@ -1,13 +1,14 @@
+// == IMPORTS: ThreeJS ==
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+// == IMPORTS: Engine Setups ==
 import { setupCamera } from     '../Components/cameraManager.ts';
 import { setupScene } from      '../Components/sceneManager.ts';
 import { setupRenderer } from   '../Components/rendererManager.ts';
-
+// == IMPORTS: My Setups ==
 import { setupSceneResources, getTexture } from  '../Components/modelManager.ts';
 import { setupLights } from                 '../Components/lightManager.ts';
-
+// == IMPORTS: Callbacks ==
 import { setupCallbacks } from './callbackManager.ts'
 
 
@@ -35,7 +36,7 @@ function update() {
 async function initialize( ) {
     // ## SETUP : RENDERING  ##
     scene = setupScene();
-    camera = setupCamera(false);
+    camera = setupCamera();
     renderer = setupRenderer();
     controls = new OrbitControls( camera, renderer.domElement );
     

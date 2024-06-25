@@ -1,4 +1,4 @@
-body {  /* remove margins and scroll bars */ 
+body {
   margin: 0;
   padding: 0;
 
@@ -8,6 +8,7 @@ body {  /* remove margins and scroll bars */
   font-variant: small-caps;
   letter-spacing: 0.4em;
 }
+
 canvas{
   position: absolute;
   top: 0;
@@ -26,10 +27,9 @@ canvas{
 
   overflow: hidden;
   user-select: none;
-
 }
 
-#info{
+#screenDiv{
   top: 0;
   left: 0;
   width: 100%;
@@ -42,16 +42,15 @@ canvas{
   text-shadow: 1px 0px 10px rgb(0, 0, 0);
 }
 
-#title{
+#titleHeader{
   top: 1rem;
   font-size: 4rem;
   font-family: 'Times New Roman', Times, serif;
 }
 
-#bottomText{
+#nameText{
   bottom: 1rem;
   font-size: 1.5rem;
   font-weight:lighter;
-  font-family: 'Times New Roman', Times, serif;
-  
+  font-family: 'Times New Roman', Times, serif;  
 }

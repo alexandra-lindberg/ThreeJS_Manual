@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { color } from 'three/examples/jsm/nodes/Nodes.js';
 
 let highlightedObject: THREE.Mesh | null = null;
 const pointer     = new THREE.Vector2();
 const raycaster   = new THREE.Raycaster();
 
 // ## CALLBACKS : SETUP ## 
+
 /**
  * Creates a Resize, PointerMove and Click callback.
  * @param camera camera of the active scene. Supports Perspective and Ortho.
@@ -22,7 +22,10 @@ function setupCallbacks(
     window.addEventListener('click', () => callbackClick(scene), false); 
 }
 
+
 // ## CALLBACKS: DEFINITIONS ##
+
+
 /**
  * Resizes the window dynamically. Supports Ortho and Perspective cameras.
  * @param camera the active camera in the scene.
@@ -126,7 +129,7 @@ function callbackClick(
        if(intersects[0].object instanceof THREE.Mesh) {
 			const objGeometry = intersects[0].object.geometry;
 
-			if( objGeometry instanceof THREE.BufferGeometry) {
+			if( objGeometry instanceof THREE.BufferGeometry) { // More than likely better suited in a vertex shader than on the CPU.
 				const posArr : Float32Array = objGeometry.getAttribute('position').array; 
 				for(let i = 0; i < posArr.length; i += 3){ // (X, y, z)
 					posArr[i] *= 1.5;				

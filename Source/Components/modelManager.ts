@@ -1,33 +1,41 @@
-import { Object3D, Scene } from "three";
+import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 let filePathArrays : Array<string> = [
     './resources/models/pidgeon_normal.glb',
+    './resources/models/pidgeon_normal_2.glb',
     './resources/models/pidgeon.glb'
 ];
 
+let gltfContainer : Array<GLTF>;
 
-async function loadAsyncModels() 
-{
+async function loadAsyncModels() {
     const loader = new GLTFLoader();
 
     const gltfPromises = filePathArrays.map((path) => {
-        return loader.loadAsync(path, function ( xhr ) { console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded'); })
+        return loader.loadAsync(path, function ( xhr ) { console.log( ( path + ' | ' +  xhr.loaded / xhr.total * 100 ) + '% loaded'); })
     });
    
     const loadedContainer = await Promise.all( gltfPromises );
     return loadedContainer;
 }
 
-async function setupModels(scene : Scene)
-{
-    const result = await loadAsyncModels();
-    console.log(result);     
-
-    for( const values of result ) {
+async function setupModels(scene : THREE.Scene) {
+    gltfContainer = await loadAsyncModels();
+    for( const values of gltfContainer ) {
         scene.add(values.scene);
     }
 }
 
+function stretchMeshes() {
+    for( const elements in gltfContainer )
+        gltfContainer[elements].scene.traverse( (object: THREE.Object3D) => {
+        if( object instanceof THREE.Mesh)
+                console.log("Found a mesh@ " + object.name);
+    });
+}
 
-export { setupModels }
+
+
+
+export { setupModels, stretchMeshes }

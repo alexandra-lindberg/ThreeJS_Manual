@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+//import testShader from '../../resources/shaders/FRAG_Test.glsl';
+
 interface Identifier {
     readonly key: string, 
     readonly filePath: string
@@ -98,6 +100,20 @@ function makePlatform(scene : THREE.Scene) {
     const material = new THREE.MeshStandardMaterial( {
         map: scaleAndReturnTexture('PlankTexture'),
         color: 'white', })
+
+    const model = new THREE.Mesh(object, material);
+    model.position.y -= 0.01;
+
+    model.userData.canScale = false;
+    scene.add(model);
+}
+
+
+function makeFirePlane(scene : THREE.Scene) {
+    const object = new THREE.BoxGeometry(5, 0.01, 5);
+    const material = new THREE.ShaderMaterial({
+        // fragmentShader: testShader,
+    })
 
     const model = new THREE.Mesh(object, material);
     model.position.y -= 0.01;

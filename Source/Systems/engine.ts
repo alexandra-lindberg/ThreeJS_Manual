@@ -5,7 +5,7 @@ import { setupCamera } from     '../Components/cameraManager.ts';
 import { setupScene } from      '../Components/sceneManager.ts';
 import { setupRenderer } from   '../Components/rendererManager.ts';
 
-import { setupSceneResources, fetchTexture } from  '../Components/modelManager.ts';
+import { setupSceneResources, getTexture } from  '../Components/modelManager.ts';
 import { setupLights } from                 '../Components/lightManager.ts';
 
 import { setupCallbacks } from './callbackManager.ts'
@@ -38,22 +38,23 @@ async function initialize( ) {
     camera = setupCamera(false);
     renderer = setupRenderer();
     controls = new OrbitControls( camera, renderer.domElement );
-    renderer.setAnimationLoop( run )
-
+    
     // ## RENDERS "BLANK" ##
-    renderer.render( scene, camera);
+    renderer.render( scene, camera);    
 
     // ## ASYNC : MODELS ##    
     await setupSceneResources(scene);
-    
+
     // ## SETUP: OBJECTS ##
     setupLights(scene);
-    setupCallbacks(camera, renderer, scene);
-
+    setupCallbacks(camera, renderer, scene);    
 
     // ## INITIAL ATTRIBUTES ##
     scene.getObjectByName('pidgeon')?.translateX(0.5);
-    scene.background = fetchTexture('BackgroundTexture') as THREE.Texture;
+    scene.background = getTexture('BackgroundTexture');
+
+    // ## SET : ANIMATION LOOP ##
+    renderer.setAnimationLoop( run )
 }
 
 

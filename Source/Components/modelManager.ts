@@ -1,19 +1,42 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { inverseLerp } from 'three/src/math/MathUtils.js';
 
-let filePathArrays : Array<string> = [
-    /*'./resources/models/pidgeon_normal.glb',*/
-    './resources/models/pidgeon_normal_2.glb',
-    /*'./resources/models/pidgeon.glb',*/
-    './resources/models/Cube.glb'
+interface Identifier {
+    key: string, 
+    filePath: string
+};
+
+let gltfPathArray : Array<Identifier> = [
+    { key : 'pidgeon',  filePath :'./resources/models/pidgeon_normal_2.glb'},
+    { key : 'pidgeonNormal',  filePath :'./resources/models/pidgeon_normal.glb'},
 
 ];
+
+let texturePathArray : Array<Identifier> = [
+    { key: 'DuckTexture', filePath: './resources/textures/ScaledDuck.png' },    
+];
+
 let gltfContainer : Array<GLTF>;
+let textureContainer : Array<THREE.Texture>;
+
 
 
 // TODO: Add texture loading
-function loadTextures(){
-    
+async function loadTextures(){
+    const loader = new THREE.TextureLoader();
+
+    const texturePromises = texturePathArray.map((path) => {
+        const loading =  loader.loadAsync(path.filePath, function ( event ) { console.log(  path, '|',  event.loaded / event.total * 100,'% loaded'); })
+        
+        loading.then(
+            (texture) => {texture.name = path.key}
+        );
+        return loading;
+    });
+
+    const loadedContainer = await Promise.all( texturePromises );
+    return loadedContainer;   
 }
 
 
@@ -25,8 +48,15 @@ function loadTextures(){
 async function loadAsyncModels() {
     const loader = new GLTFLoader();
 
-    const gltfPromises = filePathArrays.map((path) => {
-        return loader.loadAsync(path, function ( event ) { console.log(  path, '|',  event.loaded / event.total * 100,'% loaded'); })
+    const gltfPromises = gltfPathArray.map((path) => {
+        const loading =  loader.loadAsync(path.filePath, function ( event ) { console.log(  path, '|',  event.loaded / event.total * 100,'% loaded'); })
+        
+        loading.then(
+            (gltf) => {gltf.scene.name = path.key
+            }
+        );
+
+        return loading;
     });
    
     const loadedContainer = await Promise.all( gltfPromises );
@@ -41,10 +71,27 @@ async function loadAsyncModels() {
 async function setupModels(scene : THREE.Scene) {
     gltfContainer = await loadAsyncModels();
     for( const values of gltfContainer ) {
-
-        values.scene.children[0].name = "model";
         scene.add(values.scene);
     }
+
+    console.log(scene);
 }
 
-export { setupModels }
+async function setupTextures(scene : THREE.Scene) {
+    textureContainer = await loadTextures();
+    box(scene);
+}
+
+
+function box(scene : THREE.Scene) {
+    const object = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial( { map: textureContainer[0], color: 'white', })
+
+    const model = new THREE.Mesh(object, material);
+
+    model.position.x = 2;
+
+    scene.add(model);
+}
+
+export { setupModels, setupTextures }

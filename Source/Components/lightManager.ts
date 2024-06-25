@@ -3,8 +3,8 @@ import * as THREE from 'three'
 
 
 function setupLights(scene){
-    const pointLight = new THREE.PointLight("rgb(100%, 75%, 50%)", 200);
-    pointLight.position.set(.3, 1, -2);
+    const pointLight = new THREE.PointLight("rgb(100%, 75%, 50%)", 50);
+    pointLight.position.set(.3, 1, 2);
     pointLight.name = 'pointLight';
 
     const pointLightHelper = new THREE.PointLightHelper(pointLight);

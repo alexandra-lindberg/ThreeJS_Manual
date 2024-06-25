@@ -1,17 +1,15 @@
 import './resources/stylesheets/style.css';
-
+// == Mine ==
 import { setupCallbacks } from './Source/Systems/callbackManager.ts';
 import { setupCamera } from './Source/Components/cameraManager.ts';
 import { setupScene } from './Source/Components/sceneManager.ts';
 import { setupRenderer } from './Source/Components/rendererManager.ts';
-
-import { setupModels, stretchMeshes } from './Source/Components/modelManager.ts';
-
-
+import { setupModels } from './Source/Components/modelManager.ts';
+// == ThreeJS ==
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
-
+// == WebGL ==
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
 // Compatability Check.
@@ -33,18 +31,12 @@ if ( WebGL.isWebGLAvailable() ) {
     
 // ## ASYNC : MODELS ##    
     await setupModels(scene);
-    stretchMeshes();
-    
-    
-
 
 // ## FUNCTIONS : USER ##    
     function animate() { // Render loop.
-		let dTime = clock.getDelta();
-
-
+		let dTime = clock.getDelta();        
         
-        
+        scene.getObjectByName('')?.rotateY(1 * dTime); 
         		
         controls.update();      
         renderer.render( scene, camera );

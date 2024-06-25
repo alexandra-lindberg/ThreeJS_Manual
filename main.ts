@@ -1,7 +1,6 @@
 import './resources/stylesheets/style.css';
 // == Mine ==
 import { initialize, run } from './Source/Systems/engine.ts';
-
 // == WebGL ==
 import WebGL from 'three/addons/capabilities/WebGL.js';
 

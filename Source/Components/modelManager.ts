@@ -10,11 +10,14 @@ interface Identifier {
 let gltfPathArray : Array<Identifier> = [
     { key : 'pidgeon',  filePath :'./resources/models/pidgeon_normal_2.glb'},
     { key : 'pidgeonNormal',  filePath :'./resources/models/pidgeon_normal.glb'},
-
 ];
 
 let texturePathArray : Array<Identifier> = [
-    { key: 'DuckTexture', filePath: './resources/textures/ScaledDuck.png' },    
+    { key: 'DuckTexture', filePath: './resources/textures/ScaledDuck.png' },  
+    { key: 'BackgroundTexture', filePath: './resources/textures/backgroundGraphics.jpg' }, 
+    { key: 'PlankTexture', filePath: './resources/textures/planks.jpg' },    
+
+
 ];
 
 let gltfContainer : Array<GLTF>;
@@ -27,7 +30,7 @@ async function loadTextures(){
     const loader = new THREE.TextureLoader();
 
     const texturePromises = texturePathArray.map((path) => {
-        const loading =  loader.loadAsync(path.filePath, function ( event ) { console.log(  path, '|',  event.loaded / event.total * 100,'% loaded'); })
+        const loading =  loader.loadAsync(path.filePath, function ( event ) { console.log(  path.key, '|',  event.loaded / event.total * 100,'% loaded'); })
         
         loading.then(
             (texture) => {texture.name = path.key}
@@ -49,7 +52,7 @@ async function loadAsyncModels() {
     const loader = new GLTFLoader();
 
     const gltfPromises = gltfPathArray.map((path) => {
-        const loading =  loader.loadAsync(path.filePath, function ( event ) { console.log(  path, '|',  event.loaded / event.total * 100,'% loaded'); })
+        const loading =  loader.loadAsync(path.filePath, function ( event ) { console.log(  path.key, '|',  event.loaded / event.total * 100,'% loaded'); })
         
         loading.then(
             (gltf) => {gltf.scene.name = path.key
@@ -71,27 +74,50 @@ async function loadAsyncModels() {
 async function setupModels(scene : THREE.Scene) {
     gltfContainer = await loadAsyncModels();
     for( const values of gltfContainer ) {
+        values.scene.userData.canScale = true;
         scene.add(values.scene);
     }
-
-    console.log(scene);
 }
 
-async function setupTextures(scene : THREE.Scene) {
+async function setupSceneResources(scene : THREE.Scene){
+    await setupModels(scene);
     textureContainer = await loadTextures();
-    box(scene);
+
+    makePlatform(scene);
 }
 
 
-function box(scene : THREE.Scene) {
-    const object = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshStandardMaterial( { map: textureContainer[0], color: 'white', })
+function makePlatform(scene : THREE.Scene) {
+    const object = new THREE.BoxGeometry(5, 0.01, 5);
+    const material = new THREE.MeshStandardMaterial( {
+        map: scaleAndReturnTexture('PlankTexture'),
+        color: 'white', })
 
     const model = new THREE.Mesh(object, material);
+    model.position.y -= 0.01;
 
-    model.position.x = 2;
-
+    model.userData.canScale = false;
     scene.add(model);
 }
 
-export { setupModels, setupTextures }
+function fetchTexture(nameTexture: string) {
+    for(const textures of textureContainer) {
+        if(textures.name === nameTexture) {
+            return textures;
+        }
+    }
+}
+
+function scaleAndReturnTexture(nameTexture: String) {
+    const texture = fetchTexture('PlankTexture');
+    
+    if(texture !== undefined) {
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat = new THREE.Vector2(2, 1) 
+    }
+
+    return texture;
+}
+
+export { setupSceneResources, fetchTexture }

@@ -81,7 +81,7 @@ function callbackPointerMove(
 
 	highlightedObject = null;
 
-	if (intersects.length > 0) {
+	if (intersects.length > 0 && intersects[0].object.parent?.userData.canScale == true) { // Ensures group/object is scaleable
 		if(intersects[0].object instanceof THREE.Mesh) {		
 			const objMesh = intersects[0].object;
 			if(objMesh.material instanceof THREE.Material) {
@@ -122,7 +122,7 @@ function callbackClick(
 ) : void {
    const intersects = raycaster.intersectObjects( scene.children ); // Returns intersected objects array
 
-   if (intersects.length > 0) {
+   if (intersects.length > 0 && intersects[0].object.parent?.userData.canScale == true) { // Ensures group/object is scaleable
        if(intersects[0].object instanceof THREE.Mesh) {
 			const objGeometry = intersects[0].object.geometry;
 

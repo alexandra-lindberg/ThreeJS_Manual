@@ -12,7 +12,7 @@ import { setupLights } from                 '../Components/lightManager.ts';
 import { setupCallbacks } from './callbackManager.ts'
 
 
-const clock = new THREE.Clock(true);
+const clock     = new THREE.Clock(true);
 let scene       : THREE.Scene;
 let camera      : THREE.PerspectiveCamera | THREE.OrthographicCamera;
 let renderer    : THREE.WebGLRenderer;
@@ -27,6 +27,11 @@ function update() {
         
     scene.getObjectByName('pidgeon')?.rotateY(1 * dTime);
     scene.getObjectByName('pidgeonNormal')?.rotateY(10 * dTime);
+
+    // Please try to disregard this hacky solution.
+    try{ scene.getObjectByName('animated').material.uniforms.timer.value += (dTime as number);
+    }catch(error){ console.error('Wrong object name? Material of shader not found.', error) }
+
     controls.update(); 
 }
 
@@ -44,7 +49,7 @@ async function initialize( ) {
     renderer.render( scene, camera);    
 
     // ## ASYNC : MODELS ##    
-    await setupSceneResources(scene);
+    await setupSceneResources(scene, clock);
 
     // ## SETUP: OBJECTS ##
     setupLights(scene);

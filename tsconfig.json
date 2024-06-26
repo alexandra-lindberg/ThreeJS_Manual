@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["./Source/Variables/vite-env.d.ts"]
+  "include": ["","./Source/Variables/vite-env.d.ts"]
 }

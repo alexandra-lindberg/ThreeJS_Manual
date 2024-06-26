@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-//import testShader from '../../resources/shaders/FRAG_Test.glsl';
+import testFrag from '../../resources/shaders/FRAG_Test.frag?raw'; // Why redlined?
+import testVert from '../../resources/shaders/VERT_Test.vert?raw'; // Why redlined?
 
 interface Identifier {
     readonly key: string, 
@@ -17,6 +18,9 @@ let texturePathArray : Array<Identifier> = [
     { key: 'DuckTexture', filePath: './resources/textures/ScaledDuck.png' },  
     { key: 'BackgroundTexture', filePath: './resources/textures/backgroundGraphics.jpg' }, 
     { key: 'PlankTexture', filePath: './resources/textures/planks.jpg' }, 
+    { key: 'NoiseTexture', filePath: './resources/textures/Noises.png' }, 
+    { key: 'MaskTexture', filePath: './resources/textures/Shapes.png' }, 
+
 ];
 
 let gltfContainer : Array<GLTF>;
@@ -84,11 +88,12 @@ async function setupModels(scene : THREE.Scene) {
  * Asynchronus function awaiting the finishing of loading models and textures.
  * @param scene active scene to work with.
  */
-async function setupSceneResources(scene : THREE.Scene){
+async function setupSceneResources(scene : THREE.Scene, timer: THREE.Clock){
     await setupModels(scene);
     textureContainer = await loadTextures();
 
     makePlatform(scene);
+    makeFirePlane(scene);
 }
 
 /**
@@ -98,7 +103,7 @@ async function setupSceneResources(scene : THREE.Scene){
 function makePlatform(scene : THREE.Scene) {
     const object = new THREE.BoxGeometry(5, 0.01, 5);
     const material = new THREE.MeshStandardMaterial( {
-        map: scaleAndReturnTexture('PlankTexture'),
+        map: scaleAndReturnTexture('PlankTexture', 2, 1),
         color: 'white', })
 
     const model = new THREE.Mesh(object, material);
@@ -110,16 +115,27 @@ function makePlatform(scene : THREE.Scene) {
 
 
 function makeFirePlane(scene : THREE.Scene) {
-    const object = new THREE.BoxGeometry(5, 0.01, 5);
+    const object = new THREE.PlaneGeometry(1, 1, 1);
     const material = new THREE.ShaderMaterial({
-        // fragmentShader: testShader,
+        uniforms: {
+            noiseTexture: {value: scaleAndReturnTexture('NoiseTexture')},
+            maskTexture: {value: scaleAndReturnTexture('MaskTexture')},
+            timer: {value: 0 },
+        },
+        vertexShader: testVert,
+        fragmentShader: testFrag,
     })
 
     const model = new THREE.Mesh(object, material);
-    model.position.y -= 0.01;
+    model.name = "animated";
+    model.position.x -= 1;
+    model.position.y += 0.25;
+    model.scale.set(0.5, 0.5, 0.5);
 
     model.userData.canScale = false;
     scene.add(model);
+
+    console.log(material);
 }
 
 /**
@@ -144,12 +160,12 @@ function getTexture(nameTexture: string) : THREE.Texture {
  * @param nameTexture the name of the sought after texture.
  * @returns either the expected texture or a new one.
  */
-function scaleAndReturnTexture(nameTexture: string) : THREE.Texture {
+function scaleAndReturnTexture(nameTexture: string, scaleX : number = 1, scaleY : number = 1) : THREE.Texture {
     const texture = getTexture(nameTexture);
         
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat = new THREE.Vector2(2, 1) 
+    texture.repeat = new THREE.Vector2(scaleX, scaleY) 
 
     return texture;
 }
